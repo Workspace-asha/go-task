@@ -20,5 +20,16 @@ func main() {
  h := handlers.New(svc)
 
  log.Println("Server started on :" + cfg.Port)
- http.ListenAndServe(":"+cfg.Port, h.Router())
+log.Println("HTTPS server running on https://localhost:" + cfg.Port)
+
+err := http.ListenAndServeTLS(
+ ":"+cfg.Port,
+ "/certs/server.crt",
+ "/certs/server.key",
+ h.Router(),
+)
+
+if err != nil {
+ log.Fatal(err)
+}
 }

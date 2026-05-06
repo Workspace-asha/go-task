@@ -1,0 +1,49 @@
+docker compose up --build 
+
+docker ps --CHECK RUNNING CONTAINERS
+
+docker compose logs -f -- VIEW LOGS
+
+# stop everything
+docker compose down
+
+# rebuild + run
+docker compose up --build
+
+#ENTER POSTGRES SHELL
+docker exec -it <container-name> psql -U postgres -d tasks
+#VERIFY TABLES
+\dt
+
+
+#login
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"password"}'
+
+#Health Check
+curl http://localhost:8080/health
+
+#create project
+curl -X POST http://localhost:8080/projects \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzgxMzc2MjMsInVzZXJfaWQiOjF9.S4a5KlZ8Ve1sAfdx3k4RKHNnNWMOKUJ-rFUTf734uGk" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Project 1","description":"First project"}'
+
+#list projects
+curl "http://localhost:8080/projects?page=1&limit=10" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzgxMzc2MjMsInVzZXJfaWQiOjF9.S4a5KlZ8Ve1sAfdx3k4RKHNnNWMOKUJ-rFUTf734uGk"
+
+#get project by id
+curl http://localhost:8080/projects/1 \
+  -H "Authorization: Bearer <TOKEN>"
+
+#update project
+curl -X PUT http://localhost:8080/projects/1 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzgxMzc2MjMsInVzZXJfaWQiOjF9.S4a5KlZ8Ve1sAfdx3k4RKHNnNWMOKUJ-rFUTf734uGk" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Project","description":"Updated description"}'
+
+#delete project
+curl -X DELETE http://localhost:8080/projects/3 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzgxMzc2MjMsInVzZXJfaWQiOjF9.S4a5KlZ8Ve1sAfdx3k4RKHNnNWMOKUJ-rFUTf734uGk"

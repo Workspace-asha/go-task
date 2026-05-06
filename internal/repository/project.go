@@ -2,17 +2,25 @@ package repository
 
 import (
  "context"
- "task-api/internal/models"
+ "go-task/internal/models"
 
  "github.com/jackc/pgx/v5/pgxpool"
 )
 
+type ProjectRepository interface {
+	Create(ctx context.Context, p *models.Project) error
+	List(ctx context.Context, limit, offset int) ([]models.Project, error)
+	GetByID(ctx context.Context, id int) (*models.Project, error)
+	Update(ctx context.Context, id int, p *models.Project) error
+	Delete(ctx context.Context, id int) error
+}
+
 type ProjectRepo struct {
- db *pgxpool.Pool
+	db *pgxpool.Pool
 }
 
 func NewProjectRepo(db *pgxpool.Pool) *ProjectRepo {
- return &ProjectRepo{db}
+	return &ProjectRepo{db: db}
 }
 
 func (r *ProjectRepo) Create(ctx context.Context, p *models.Project) error {
@@ -39,4 +47,33 @@ func (r *ProjectRepo) List(ctx context.Context, limit, offset int) ([]models.Pro
   res = append(res, p)
  }
  return res, nil
+}
+
+func (r *ProjectRepo) GetByID(ctx context.Context, id int) (*models.Project, error) {
+ var p models.Project
+ err := r.db.QueryRow(ctx,
+  `SELECT id, name, description FROM projects WHERE id=$1`,
+  id,
+ ).Scan(&p.ID, &p.Name, &p.Description)
+
+ if err != nil {
+  return nil, err
+ }
+ return &p, nil
+}
+
+func (r *ProjectRepo) Update(ctx context.Context, id int, p *models.Project) error {
+ _, err := r.db.Exec(ctx,
+  `UPDATE projects SET name=$1, description=$2 WHERE id=$3`,
+  p.Name, p.Description, id,
+ )
+ return err
+}
+
+func (r *ProjectRepo) Delete(ctx context.Context, id int) error {
+ _, err := r.db.Exec(ctx,
+  `DELETE FROM projects WHERE id=$1`,
+  id,
+ )
+ return err
 }
