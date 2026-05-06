@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-task
+  namespace: go-task
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-task
+  template:
+    metadata:
+      labels:
+        app: go-task
+    spec:
+      containers:
+        - name: api
+          image: go-task:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: app-secrets

@@ -7,7 +7,7 @@ A small, production-style REST API demonstrating:
 * PostgreSQL (relational DB)
 * Dockerized local setup
 * Kubernetes-ready manifests
-* **HTTPS enabled (self-signed certificates)** 🔐
+* **HTTPS enabled (self-signed certificates)** 
 
 ## Prerequisites
 Docker (Desktop or Engine)
@@ -23,6 +23,7 @@ openssl req -x509 -newkey rsa:4096 \
   -days 365 -nodes \
   -subj "/CN=localhost"
 
+# BUILD AND TEST SERVICE
 
 1) Build & Run
 
@@ -35,7 +36,6 @@ This starts:
 
 2) Initialize Database (one-time)
 
-
 docker exec -it $(docker ps -qf "ancestor=postgres:16") \
 psql -U postgres -d tasks -c "
 CREATE TABLE IF NOT EXISTS projects (
@@ -46,14 +46,13 @@ CREATE TABLE IF NOT EXISTS projects (
 
 3) Get JWT Token (HTTPS)
 
-
 TOKEN=$(curl -sk -X POST https://localhost:8080/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password"}' \
   | jq -r .token)
 
 
-If `jq` is not installed, run login manually:
+OR below command to get the jwt token
 
 curl -k -X POST https://localhost:8080/login \
   -H "Content-Type: application/json" \
@@ -62,14 +61,14 @@ curl -k -X POST https://localhost:8080/login \
 
 4) End-to-End Test (CRUD over HTTPS)
 
-### Create
+### Create Project
 
 curl -k -X POST https://localhost:8080/projects \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"Demo","description":"Test project"}'
 
-### List (with pagination)
+### List Project (with pagination)
 curl -k "https://localhost:8080/projects?page=1&limit=10" \
   -H "Authorization: Bearer $TOKEN"
 
@@ -80,7 +79,7 @@ curl -k https://localhost:8080/projects/1 \
   -H "Authorization: Bearer $TOKEN"
 
 
-### Update
+### Update Project
 
 curl -k -X PUT https://localhost:8080/projects/1 \
   -H "Authorization: Bearer $TOKEN" \
@@ -88,7 +87,7 @@ curl -k -X PUT https://localhost:8080/projects/1 \
   -d '{"name":"Updated","description":"Updated desc"}'
 
 
-### Delete
+### Delete Project
 
 curl -k -X DELETE https://localhost:8080/projects/1 \
   -H "Authorization: Bearer $TOKEN"
